@@ -28,10 +28,10 @@ interface FieldSpec {
 }
 
 const FIELDS: FieldSpec[] = [
-  { group: '图片生成', key: 'imageProvider', label: 'Provider（jiutian=九天 / wanx=万相）', type: 'select', options: ['jiutian', 'wanx'] },
-  { group: '九天 moma', sub: 'jiutian', key: 'baseUrl', label: 'Base URL', type: 'text' },
-  { group: '九天 moma', sub: 'jiutian', key: 'apiKey', label: 'API Key', type: 'secret' },
-  { group: '九天 moma', sub: 'jiutian', key: 'imageModel', label: '文生图模型', type: 'text' },
+  { group: '图片生成', key: 'imageProvider', label: 'Provider（internal=内网 / wanx=万相）', type: 'select', options: ['internal', 'wanx'] },
+  { group: '内网', sub: 'internal', key: 'baseUrl', label: 'Base URL', type: 'text' },
+  { group: '内网', sub: 'internal', key: 'apiKey', label: 'API Key', type: 'secret' },
+  { group: '内网', sub: 'internal', key: 'imageModel', label: '文生图模型', type: 'text' },
   { group: '万相 dashscope', sub: 'wanx', key: 'baseUrl', label: 'Base URL', type: 'text' },
   { group: '万相 dashscope', sub: 'wanx', key: 'apiKey', label: 'API Key', type: 'secret' },
   { group: '万相 dashscope', sub: 'wanx', key: 'imageModel', label: '图片模型', type: 'text' },

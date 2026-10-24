@@ -11,20 +11,20 @@ import z from '@deepseek-ai/schemastery'
 const SETTINGS_NS = 'dsh-feed'
 
 export interface Config {
-  imageProvider: 'jiutian' | 'wanx'
-  jiutian: { baseUrl: string; apiKey: string; imageModel: string }
+  imageProvider: 'internal' | 'wanx'
+  internal: { baseUrl: string; apiKey: string; imageModel: string }
   wanx: { baseUrl: string; apiKey: string; imageModel: string; videoModel: string }
   llm: { provider: string; model: string }
   feed: { scanIntervalMinutes: number; maxGeneratePerScan: number; regenIntervalHours: number }
 }
 
 export const Config: z<Config> = z.object({
-  imageProvider: z.union(['jiutian', 'wanx'])
-    .default('jiutian').description('图片生成 provider（jiutian 走九天，wanx 走万相）'),
-  jiutian: z.object({
-    baseUrl: z.string().default('http://moma.hq.cmcc/largemodel/moma').description('九天 moma base URL'),
-    apiKey: z.string().default('').description('九天 API key（未填则图片生成跳过）'),
-    imageModel: z.string().default('cntxt2image').description('九天文生图模型'),
+  imageProvider: z.union(['internal', 'wanx'])
+    .default('internal').description('图片生成 provider（internal 走内网，wanx 走万相）'),
+  internal: z.object({
+    baseUrl: z.string().default('http://moma.hq.cmcc/largemodel/moma').description('内网 base URL'),
+    apiKey: z.string().default('').description('内网 API key（未填则图片生成跳过）'),
+    imageModel: z.string().default('cntxt2image').description('内网文生图模型'),
   }).default({}),
   wanx: z.object({
     baseUrl: z.string().default('https://dashscope.aliyuncs.com').description('万相 base URL'),
@@ -47,8 +47,8 @@ export const Config: z<Config> = z.object({
 Object.assign(Config.meta, { volatile: true })
 
 const FALLBACK = {
-  imageProvider: 'jiutian' as const,
-  jiutian: { baseUrl: 'http://moma.hq.cmcc/largemodel/moma', apiKey: '', imageModel: 'cntxt2image' },
+  imageProvider: 'internal' as const,
+  internal: { baseUrl: 'http://moma.hq.cmcc/largemodel/moma', apiKey: '', imageModel: 'cntxt2image' },
   wanx: { baseUrl: 'https://dashscope.aliyuncs.com', apiKey: '', imageModel: 'wanx2.1-t2i-turbo', videoModel: 'wanx2.1-t2v-turbo' },
   llm: { provider: 'bailian-coding', model: 'glm-5.2' },
   feed: { scanIntervalMinutes: 10, maxGeneratePerScan: 3, regenIntervalHours: 12 },
@@ -59,7 +59,7 @@ const FALLBACK = {
 export function readLiveConfig(ctx: Context, config: Config) {
   return (): {
     imageProvider: string
-    jiutian: any
+    internal: any
     wanx: any
     llm: any
     feed: { scanIntervalMinutes: number; maxGeneratePerScan: number; regenIntervalHours: number }
@@ -76,7 +76,7 @@ export function readLiveConfig(ctx: Context, config: Config) {
     const merge = (fb: any, ov: any) => ({ ...fb, ...(ov ?? {}) })
     return {
       imageProvider: live?.imageProvider ?? config.imageProvider ?? FALLBACK.imageProvider,
-      jiutian: merge(FALLBACK.jiutian, { ...(config.jiutian ?? {}), ...(live?.jiutian ?? {}) }),
+      internal: merge(FALLBACK.internal, { ...(config.internal ?? {}), ...(live?.internal ?? {}) }),
       wanx: merge(FALLBACK.wanx, { ...(config.wanx ?? {}), ...(live?.wanx ?? {}) }),
       llm: merge(FALLBACK.llm, { ...(config.llm ?? {}), ...(live?.llm ?? {}) }),
       feed: merge(FALLBACK.feed, { ...(config.feed ?? {}), ...(live?.feed ?? {}) }),

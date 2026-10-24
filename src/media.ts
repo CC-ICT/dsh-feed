@@ -1,5 +1,5 @@
 /**
- * dsh-feed — 图片/视频生成（九天 moma / 万相 dashscope）。
+ * dsh-feed — 图片/视频生成（内网 / 万相 dashscope）。
  *
  * 配置运行时从 readCfg() 读（volatile 根 config 不进 apply 参数，见 config.ts）。
  */
@@ -11,7 +11,7 @@ import * as logger from './log'
 
 type ReadCfg = () => {
   imageProvider: string
-  jiutian: { baseUrl: string; apiKey: string; imageModel: string }
+  internal: { baseUrl: string; apiKey: string; imageModel: string }
   wanx: { baseUrl: string; apiKey: string; imageModel: string; videoModel: string }
 }
 
@@ -90,38 +90,38 @@ export function createMedia(readCfg: ReadCfg, imagesDir: string, videosDir: stri
   /** 生成图片：按 imageProvider 分派，返回 /dsh-feed/images/xxx 本地服务路径 */
   async function generateImage(prompt: string): Promise<string> {
     if (readCfg().imageProvider === 'wanx') return generateImageWanx(prompt)
-    return generateImageJiutian(prompt)
+    return generateImageInternal(prompt)
   }
 
-  /** 九天 moma cntxt2image：同步生成 → fs/getFile 下载到本地 */
-  async function generateImageJiutian(prompt: string): Promise<string> {
+  /** 内网 cntxt2image：同步生成 → fs/getFile 下载到本地 */
+  async function generateImageInternal(prompt: string): Promise<string> {
     const cfg = readCfg()
-    const JIUTIAN_BASE = cfg.jiutian.baseUrl
-    const JIUTIAN_API_KEY = cfg.jiutian.apiKey
-    if (!JIUTIAN_API_KEY) throw new Error('九天 apiKey 未配置（设置界面填入后重启）')
-    logger.info('九天图片：提交生成，prompt=%s', prompt.slice(0, 60))
-    const res = await fetch(`${JIUTIAN_BASE}/api/v1/images/generations`, {
+    const INTERNAL_BASE = cfg.internal.baseUrl
+    const INTERNAL_API_KEY = cfg.internal.apiKey
+    if (!INTERNAL_API_KEY) throw new Error('内网 apiKey 未配置（设置界面填入后重启）')
+    logger.info('内网图片：提交生成，prompt=%s', prompt.slice(0, 60))
+    const res = await fetch(`${INTERNAL_BASE}/api/v1/images/generations`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${JIUTIAN_API_KEY}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${INTERNAL_API_KEY}` },
       body: JSON.stringify({
-        model: cfg.jiutian.imageModel, prompt, n: 1, ratio: '1:1',
+        model: cfg.internal.imageModel, prompt, n: 1, ratio: '1:1',
         waterMarkLevel: 0, enhancePrompt: true, auditSwitch: true,
       }),
       signal: AbortSignal.timeout(120000),
     })
     const data: any = await res.json().catch(() => ({}))
-    if (!res.ok) throw new Error(`jiutian image HTTP ${res.status}: ${JSON.stringify(data).slice(0, 200)}`)
+    if (!res.ok) throw new Error(`internal image HTTP ${res.status}: ${JSON.stringify(data).slice(0, 200)}`)
     const fileKey = data?.data?.[0]?.url
-    if (!fileKey) throw new Error(`jiutian image no url: ${JSON.stringify(data).slice(0, 200)}`)
-    const dlRes = await fetch(`${JIUTIAN_BASE}/api/v1/fs/getFile?key=${encodeURIComponent(fileKey)}`, {
-      headers: { 'Authorization': `Bearer ${JIUTIAN_API_KEY}` },
+    if (!fileKey) throw new Error(`internal image no url: ${JSON.stringify(data).slice(0, 200)}`)
+    const dlRes = await fetch(`${INTERNAL_BASE}/api/v1/fs/getFile?key=${encodeURIComponent(fileKey)}`, {
+      headers: { 'Authorization': `Bearer ${INTERNAL_API_KEY}` },
       signal: AbortSignal.timeout(60000),
     })
-    if (!dlRes.ok) throw new Error(`jiutian image download HTTP ${dlRes.status}`)
+    if (!dlRes.ok) throw new Error(`internal image download HTTP ${dlRes.status}`)
     const buf = Buffer.from(await dlRes.arrayBuffer())
     const filename = `${randomUUID()}.jpg`
     writeFileSync(join(imagesDir, filename), buf)
-    logger.info('九天图片：已保存 %s (%d KB)', filename, buf.length / 1024)
+    logger.info('内网图片：已保存 %s (%d KB)', filename, buf.length / 1024)
     return `/dsh-feed/images/${filename}`
   }
 
