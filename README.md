@@ -15,10 +15,10 @@ dsh-feed 读取 meow-memory 的记忆，判定哪些值得做成内容，再由 
 支持 **DSH 0.2.1-rc.2 Web 版**。需要 Node.js `^22.19.0` 或 `>=24.0.0`，并需配置可用 LLM 模型与图片/视频 provider 的 API key。
 
 1. 打开 DSH 左侧 **插件 → 添加插件**。
-2. 粘贴 tgz 地址安装（替换为你自己的 release 地址）：
+2. 粘贴 tgz 地址安装：
 
 ```text
-<你的 GitHub release tgz 地址>
+https://github.com/CC-ICT/dsh-feed/releases/latest/download/dsh-feed.tgz
 ```
 
 或下载后本地安装：
