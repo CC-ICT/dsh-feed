@@ -1,0 +1,4 @@
+# dsh-feed bundle patch
+- insert:
+    - id: dsh-feed
+      name: 'dsh-feed'
