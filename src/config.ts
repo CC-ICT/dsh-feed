@@ -22,7 +22,7 @@ export const Config: z<Config> = z.object({
   imageProvider: z.union(['internal', 'wanx'])
     .default('internal').description('图片生成 provider（internal 走内网，wanx 走万相）'),
   internal: z.object({
-    baseUrl: z.string().default('http://moma.hq.cmcc/largemodel/moma').description('内网 base URL'),
+    baseUrl: z.string().default('http://m**a.h*.c**c/largemodel/m**a').description('内网 base URL'),
     apiKey: z.string().default('').description('内网 API key（未填则图片生成跳过）'),
     imageModel: z.string().default('cntxt2image').description('内网文生图模型'),
   }).default({}),
@@ -48,7 +48,7 @@ Object.assign(Config.meta, { volatile: true })
 
 const FALLBACK = {
   imageProvider: 'internal' as const,
-  internal: { baseUrl: 'http://moma.hq.cmcc/largemodel/moma', apiKey: '', imageModel: 'cntxt2image' },
+  internal: { baseUrl: 'http://m**a.h*.c**c/largemodel/m**a', apiKey: '', imageModel: 'cntxt2image' },
   wanx: { baseUrl: 'https://dashscope.aliyuncs.com', apiKey: '', imageModel: 'wanx2.1-t2i-turbo', videoModel: 'wanx2.1-t2v-turbo' },
   llm: { provider: 'bailian-coding', model: 'glm-5.2' },
   feed: { scanIntervalMinutes: 10, maxGeneratePerScan: 3, regenIntervalHours: 12 },
